@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "366308632069",
+    "project_id": "notification-bali2",
+    "storage_bucket": "notification-bali2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366308632069:android:d7e0426d6d3537ed869e6c",
+        "android_client_info": {
+          "package_name": "com.example.bali_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCG201j47Bc42b1MLzg1BF_ybY3V2Xr6g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
