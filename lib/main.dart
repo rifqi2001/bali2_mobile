@@ -66,6 +66,6 @@ class MyApp extends StatelessWidget {
 }
 
 class Config {
-  // static const String baseUrl = 'http://192.168.43.9:80/api';
-  static const String baseUrl = 'http://beachgo-balongan.my.id/api';
+  static const String baseUrl = 'http://192.168.43.9:80/api';
+  // static const String baseUrl = 'http://beachgo-balongan.my.id/api';
 }

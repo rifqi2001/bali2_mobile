@@ -36,7 +36,8 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
     
     if (widget.orderData['id'] == null ||
         widget.orderData['visit_date'] == null ||
-        widget.orderData['ticket_count'] == null ||
+        widget.orderData['adult_ticket_count'] == null ||
+        widget.orderData['child_ticket_count'] == null ||
         widget.orderData['total_price'] == null ||
         widget.orderData['status'] == null) {
       print("Order Data is missing required fields!");
@@ -188,7 +189,9 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
     final orderData = widget.orderData;
     final status = orderData['status'];
     final visit_date = orderData['visit_date'];
-    final ticket_count = orderData['ticket_count'].toString();
+    // final ticket_count = orderData['ticket_count'].toString();
+    final adult_ticket_count = orderData['adult_ticket_count'].toString();
+    final child_ticket_count = orderData['child_ticket_count'].toString();
     final total_price = orderData['total_price'].toString();
 
     return Scaffold(
@@ -247,7 +250,8 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 5.0),
-            Text(ticket_count),
+            Text("Dewasa = $adult_ticket_count"),
+            Text("Anak-anak = $child_ticket_count"),
             Spacer(),
             Text(
               'Total Harga:',

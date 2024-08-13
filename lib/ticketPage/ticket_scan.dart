@@ -18,7 +18,8 @@ class _TicketScanState extends State<TicketScan> {
   late String idNumber;
   late String qrData;
   late String status;
-  late String ticket;
+  late String ticket_adult;
+  late String ticket_child;
   late String ticketNumber;
   String? username;
   // bool isLoading = true;
@@ -52,7 +53,8 @@ class _TicketScanState extends State<TicketScan> {
       qrData = orderData['ticket_number'].toString();
       ticketNumber = orderData['ticket_number'].toString();
       status = orderData['status'];
-      ticket = orderData['ticket_count'].toString();
+      ticket_adult = orderData['adult_ticket_count'].toString();
+      ticket_child = orderData['child_ticket_count'].toString();
     });
   }
 
@@ -170,7 +172,7 @@ class _TicketScanState extends State<TicketScan> {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(ticket),
+                        child: Text("Dewasa: $ticket_adult\nAnak-anak: $ticket_child"),
                       ),
                       Expanded(
                         child: Text(status),

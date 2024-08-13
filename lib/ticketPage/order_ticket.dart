@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:bali_2/ticketPage/detail_ticket.dart';
-import 'package:bali_2/ticketPage/ticket_scan.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -19,10 +17,14 @@ class TicketPage extends StatefulWidget {
 
 class _TicketPageState extends State<TicketPage> {
   DateTime? _selectedDate;
-  int _ticketCount = 1;
+  int _adultTicketCount = 1;
+  int _childTicketCount = 0;
+  // int _ticketCount = 1;
   String _promoCode = '';
   double _totalPrice = 0.0;
   bool _isLoading = false;
+  double _adultPrice = 0.0;
+  double _childPrice = 0.0;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -34,12 +36,48 @@ class _TicketPageState extends State<TicketPage> {
     if (picked != null && picked != _selectedDate)
       setState(() {
         _selectedDate = picked;
+        _fetchTicketPrices();
       });
   }
 
+  Future<void> _fetchTicketPrices() async {
+    if (_selectedDate == null) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/ticket/prices?date=${DateFormat('yyyy-MM-dd').format(_selectedDate!)}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        _adultPrice = (data['adult_price'] as num).toDouble();
+      _childPrice = (data['child_price'] as num).toDouble();
+        _calculateTotalPrice();
+      });
+    } else {
+      _showError('Gagal mengambil harga tiket.');
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   void _calculateTotalPrice() {
-    const double ticketPrice = 15000;
-    _totalPrice = ticketPrice * _ticketCount;
+    _totalPrice =
+        (_adultPrice * _adultTicketCount) + (_childPrice * _childTicketCount);
   }
 
   Future<void> _orderTicket() async {
@@ -74,7 +112,8 @@ class _TicketPageState extends State<TicketPage> {
       },
       body: jsonEncode(<String, dynamic>{
         'visit_date': DateFormat('yyyy-MM-dd').format(_selectedDate!),
-        'ticket_count': _ticketCount,
+        'adult_ticket_count': _adultTicketCount,
+        'child_ticket_count': _childTicketCount,
         'promo_code': _promoCode,
         'total_price': _totalPrice,
       }),
@@ -93,7 +132,8 @@ class _TicketPageState extends State<TicketPage> {
       final orderData = {
         'id': responseData['id'],
         'visit_date': DateFormat('yyyy-MM-dd').format(_selectedDate!),
-        'ticket_count': _ticketCount,
+        'adult_ticket_count': _adultTicketCount,
+        'child_ticket_count': _childTicketCount,
         'promo_code': _promoCode,
         'total_price': _totalPrice,
         'ticket_number': responseData['ticket_number'],
@@ -138,7 +178,8 @@ class _TicketPageState extends State<TicketPage> {
             children: [
               Text(
                   "Tanggal Kunjungan: ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}"),
-              Text("Jumlah Tiket: $_ticketCount"),
+              Text("Jumlah Tiket Dewasa: $_adultTicketCount"),
+              Text("Jumlah Tiket Anak-anak: $_childTicketCount"),
               Text("Total Harga: \Rp.${_totalPrice.toStringAsFixed(2)}"),
             ],
           ),
@@ -162,7 +203,7 @@ class _TicketPageState extends State<TicketPage> {
   }
 
   void _showSuccessMessage(Map<String, dynamic> ticket) {
-    print("Ticket Data: $ticket");  // Tambahkan ini untuk memeriksa data tiket
+    print("Ticket Data: $ticket"); // Tambahkan ini untuk memeriksa data tiket
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -187,7 +228,6 @@ class _TicketPageState extends State<TicketPage> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +271,7 @@ class _TicketPageState extends State<TicketPage> {
                   ),
                   SizedBox(height: 20),
                   Text(
-                    "Jumlah Tiket:",
+                    "Jumlah Tiket Dewasa",
                     style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(height: 10),
@@ -239,24 +279,24 @@ class _TicketPageState extends State<TicketPage> {
                     children: [
                       IconButton(
                         icon: Icon(Icons.remove),
-                        onPressed: _ticketCount > 1
+                        onPressed: _adultTicketCount > 1
                             ? () {
                                 setState(() {
-                                  _ticketCount--;
+                                  _adultTicketCount--;
                                 });
                               }
                             : null,
                       ),
                       Text(
-                        '$_ticketCount',
+                        '$_adultTicketCount',
                         style: TextStyle(fontSize: 16),
                       ),
                       IconButton(
                         icon: Icon(Icons.add),
-                        onPressed: _ticketCount < 10
+                        onPressed: _adultTicketCount < 10
                             ? () {
                                 setState(() {
-                                  _ticketCount++;
+                                  _adultTicketCount++;
                                 });
                               }
                             : null,
@@ -265,10 +305,39 @@ class _TicketPageState extends State<TicketPage> {
                   ),
                   SizedBox(height: 20),
                   Text(
-                    "Kode Promo",
+                    "Jumlah Tiket Anak-anak:",
                     style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(height: 10),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: _childTicketCount > 0
+                            ? () {
+                                setState(() {
+                                  _childTicketCount--;
+                                });
+                              }
+                            : null,
+                      ),
+                      Text(
+                        '$_childTicketCount',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: _childTicketCount < 10
+                            ? () {
+                                setState(() {
+                                  _childTicketCount++;
+                                });
+                              }
+                            : null,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
                   TextField(
                     onChanged: (value) {
                       setState(() {
@@ -284,10 +353,10 @@ class _TicketPageState extends State<TicketPage> {
                   Center(
                     child: ElevatedButton(
                       onPressed: _orderTicket,
-                      child: Text("Kirim", style: TextStyle(color: Colors.white)),
+                      child:
+                          Text("Cek Pesanan", style: TextStyle(color: Colors.white)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 128, 187, 197)
-                      ),
+                          backgroundColor: Color.fromARGB(255, 128, 187, 197)),
                     ),
                   ),
                 ],
