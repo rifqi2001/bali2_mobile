@@ -27,39 +27,11 @@ class AboutUsPage extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 20.0),
-            // Text(
-            //   'Visi dan Misi',
-            //   style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-            // ),
-            // SizedBox(height: 10.0),
-            // Text(
-            //   'Visi kami adalah...',
-            //   textAlign: TextAlign.center,
-            // ),
-            // Text(
-            //   'Misi kami adalah...',
-            //   textAlign: TextAlign.center,
-            // ),
             Text(
               'Informasi Harga Tiket',
               style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10.0),
-            Text(
-              'Tiket Masuk : Rp.15.000,00',
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 10.0),
-            Text(
-              'Tiket Parkir Motor : Rp.2.000,00',
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 10.0),
-            Text(
-              'Tiket Parkir Mobil :  Rp.5.000,00',
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 20.0),
             Text(
               'Tim Pengembang',
               style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),

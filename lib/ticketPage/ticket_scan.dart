@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../main.dart';
 
 class TicketScan extends StatefulWidget {
   final Map<String, dynamic> orderData;
@@ -22,13 +25,17 @@ class _TicketScanState extends State<TicketScan> {
   late String ticket_child;
   late String ticketNumber;
   String? username;
-  // bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     fetchTicketData();
     _loadUserData();
+
+    // Periksa status tiket setiap 5 detik
+    Timer.periodic(Duration(seconds: 5), (timer) {
+      _checkTicketStatus();
+    });
   }
 
   Future<void> _loadUserData() async {
@@ -46,7 +53,6 @@ class _TicketScanState extends State<TicketScan> {
     final orderData = widget.orderData;
 
     setState(() {
-      // username = widget.username;
       idNumber = orderData['id']?.toString() ?? 'N/A';
       date = orderData['visit_date'] ?? 'N/A';
       price = orderData['total_price'].toString();
@@ -56,6 +62,51 @@ class _TicketScanState extends State<TicketScan> {
       ticket_adult = orderData['adult_ticket_count'].toString();
       ticket_child = orderData['child_ticket_count'].toString();
     });
+  }
+
+  Future<void> _checkTicketStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('${Config.baseUrl}/ticket/${widget.orderData['id']}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['status'] == 'nonaktif' && status != 'nonaktif') {
+        setState(() {
+          status = 'nonaktif';
+        });
+        _showSuccessMessage();
+      }
+    } else {
+      print('Failed to check ticket status.');
+    }
+  }
+
+  void _showSuccessMessage() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Tiket Berhasil di Scan"),
+          content: Text("Tiket anda berhasil di scan. Silahkan masuk."),
+          actions: [
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _refreshData() async {
@@ -97,22 +148,23 @@ class _TicketScanState extends State<TicketScan> {
                   Text("Scan Kode QR tiket di loket"),
                   SizedBox(height: 5.0),
                   status == 'nonaktif'
-                    ? Column(
-                        children: [
-                          Text(
-                            "Tiket ini nonaktif dan tidak dapat discan",
-                            style: TextStyle(color: Colors.red),
-                          ),
-                          SizedBox(height: 20.0),
-                          Icon(Icons.block, size: 100.0, color: Colors.red),
-                        ],
-                      )
-                    : QrImageView(
-                        data: 'http://beachgo-balongan.my.id/tickets/${widget.orderData['id']}',
-                        embeddedImage: AssetImage('assets/images/bali2_logo.png'),
-                        version: QrVersions.auto,
-                        size: 200.0,
-                      ),
+                      ? Column(
+                          children: [
+                            Text(
+                              "Tiket ini nonaktif dan tidak dapat discan",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            SizedBox(height: 20.0),
+                            Icon(Icons.block, size: 100.0, color: Colors.red),
+                          ],
+                        )
+                      : QrImageView(
+                          data: qrData,
+                          embeddedImage:
+                              AssetImage('assets/images/bali2_logo.png'),
+                          version: QrVersions.auto,
+                          size: 200.0,
+                        ),
                   SizedBox(height: 50.0),
                   Row(
                     children: [
@@ -172,7 +224,8 @@ class _TicketScanState extends State<TicketScan> {
                   Row(
                     children: [
                       Expanded(
-                        child: Text("Dewasa: $ticket_adult\nAnak-anak: $ticket_child"),
+                        child: Text(
+                            "Dewasa: $ticket_adult\nAnak-anak: $ticket_child"),
                       ),
                       Expanded(
                         child: Text(status),

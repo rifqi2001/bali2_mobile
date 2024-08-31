@@ -81,7 +81,7 @@ class _MyTicketPageState extends State<MyTicketPage> {
                 Color bgColor;
 
                 switch (status) {
-                  case 'Belum Bayar':
+                  case 'belum bayar':
                     bgColor = Color.fromARGB(255, 181, 244, 255);
                     break;
                   case 'aktif':

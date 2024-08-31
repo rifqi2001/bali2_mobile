@@ -30,16 +30,16 @@ class ContentDetailPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => FullScreenImageViewer(
-                        imageUrl: 'http://beachgo-balongan.my.id${news['image']}',
-                        // imageUrl: 'http://192.168.43.9:80${news['image']}',
+                        // imageUrl: 'http://beachgo-balongan.my.id${news['image']}',
+                        imageUrl: 'http://192.168.1.200:80${news['image']}',
                       ),
                     ),
                   );
                 },
                 child: Hero(
                   tag: 'imageHero',
-                  child: Image.network('http://beachgo-balongan.my.id${news['image']}'),
-                  // child: Image.network('http://192.168.43.9:80${news['image']}'),
+                  // child: Image.network('http://beachgo-balongan.my.id${news['image']}'),
+                  child: Image.network('http://192.168.1.200:80${news['image']}'),
                 ),
               ),
               SizedBox(height: 10),

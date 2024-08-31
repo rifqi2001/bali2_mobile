@@ -125,10 +125,8 @@ class _TicketPageState extends State<TicketPage> {
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
-      if (responseData['id'] == null) {
-        _showError('ID tidak ditemukan dalam respons API.');
-        return;
-      }
+
+    if (responseData['id'] != null) {
       final orderData = {
         'id': responseData['id'],
         'visit_date': DateFormat('yyyy-MM-dd').format(_selectedDate!),
@@ -141,9 +139,12 @@ class _TicketPageState extends State<TicketPage> {
       };
       _showSuccessMessage(orderData);
     } else {
-      final errorData = json.decode(response.body);
-      _showError(errorData['message'] ?? 'Booking failed. Please try again.');
+      _showError('ID tidak ditemukan dalam respons API.');
     }
+  } else {
+    final errorData = json.decode(response.body);
+    _showError(errorData['message'] ?? 'Booking failed. Please try again.');
+  }
   }
 
   void _showError(String message) {

@@ -146,8 +146,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                     items: newsData.map((news) {
                       // final imageUrl = news['image'];
-                      final imageUrl = 'http://beachgo-balongan.my.id/${news['image']}';
-                      // final imageUrl = 'http://192.168.43.9:80/${news['image']}';
+                      // final imageUrl = 'http://beachgo-balongan.my.id/${news['image']}';
+                      final imageUrl = 'http://192.168.1.200:80${news['image']}';
                       print('Image URL: $imageUrl');
                       return InkWell(
                         onTap: () => _navigateToNewsDetail(news),

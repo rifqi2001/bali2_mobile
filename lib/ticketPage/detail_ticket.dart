@@ -203,6 +203,15 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
             Text("Detail Pembayaran"),
           ],
         ),
+        actions: [
+          if (widget.orderData['status'] == 'belum bayar')
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                _confirmDelete();
+              },
+            ),
+          ],
       ),
       body: Padding(
         padding: EdgeInsets.all(20.0),
